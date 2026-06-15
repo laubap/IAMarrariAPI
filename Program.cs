@@ -50,6 +50,21 @@ app.Run();
 
 static void TreinarModelo(string entrada, string enriquecido, string modelo)
 {
+    Console.WriteLine();
+    Console.WriteLine("====================================");
+    Console.WriteLine($"Treinando modelo: {modelo}");
+    Console.WriteLine($"CSV entrada: {entrada}");
+    Console.WriteLine($"CSV enriquecido: {enriquecido}");
+
+    if (!File.Exists(entrada))
+        throw new Exception($"Arquivo não encontrado: {entrada}");
+
+    var linhasEntrada = File.ReadAllLines(entrada)
+        .Where(l => !string.IsNullOrWhiteSpace(l))
+        .ToList();
+
+    Console.WriteLine($"Linhas no CSV de entrada: {linhasEntrada.Count}");
+
     var detector = new AnomalyDetectionService();
 
     CsvFeatureGenerator.Gerar(
@@ -57,6 +72,19 @@ static void TreinarModelo(string entrada, string enriquecido, string modelo)
         caminhoSaida: enriquecido
     );
 
+    Console.WriteLine($"CSV enriquecido criado: {File.Exists(enriquecido)}");
+
+    if (File.Exists(enriquecido))
+    {
+        var linhasEnriquecido = File.ReadAllLines(enriquecido)
+            .Where(l => !string.IsNullOrWhiteSpace(l))
+            .ToList();
+
+        Console.WriteLine($"Linhas no CSV enriquecido: {linhasEnriquecido.Count}");
+    }
+
     detector.Treinar(enriquecido);
     detector.SalvarModelo(modelo);
+
+    Console.WriteLine($"Modelo salvo com sucesso: {modelo}");
 }

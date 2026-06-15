@@ -23,11 +23,14 @@ public class AnomalyDetectionService
                 nameof(SensorData.Variacao),
                 nameof(SensorData.MinJanela5),
                 nameof(SensorData.MaxJanela5),
-                nameof(SensorData.DesvioPadrao5)
+                nameof(SensorData.DesvioPadrao5),
+                nameof(SensorData.DiferencaDaMedia),
+                nameof(SensorData.ZScore),
+                nameof(SensorData.AmplitudeJanela)
             )
             .Append(_mlContext.AnomalyDetection.Trainers.RandomizedPca(
                 featureColumnName: "Features",
-                rank: 3
+                rank: 1
             ));
 
         var modelo = pipeline.Fit(dataView);

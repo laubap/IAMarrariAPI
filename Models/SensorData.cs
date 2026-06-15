@@ -19,4 +19,13 @@ public class SensorData
 
     [LoadColumn(6)]
     public float DesvioPadrao5 { get; set; }
+
+    [LoadColumn(7)]
+    public float DiferencaDaMedia { get; set; }
+
+    [LoadColumn(8)]
+    public float ZScore { get; set; }
+
+    [LoadColumn(9)]
+    public float AmplitudeJanela { get; set; }
 }

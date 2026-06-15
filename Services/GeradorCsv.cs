@@ -9,7 +9,7 @@ public static class CsvFeatureGenerator
 
         var linhasSaida = new List<string>
         {
-            "DataHora;ValorAtual;MediaMovel5;Variacao;MinJanela5;MaxJanela5;DesvioPadrao5"
+            "DataHora;ValorAtual;MediaMovel5;Variacao;MinJanela5;MaxJanela5;DesvioPadrao5;DiferencaDaMedia;ZScore;AmplitudeJanela"
         };
 
         for (int i = 0; i < historico.Count; i++)
@@ -23,8 +23,12 @@ public static class CsvFeatureGenerator
                 $"{features.Variacao.ToString("F4", CultureInfo.InvariantCulture)};" +
                 $"{features.MinJanela5.ToString(CultureInfo.InvariantCulture)};" +
                 $"{features.MaxJanela5.ToString(CultureInfo.InvariantCulture)};" +
-                $"{features.DesvioPadrao5.ToString("F4", CultureInfo.InvariantCulture)}"
+                $"{features.DesvioPadrao5.ToString("F4", CultureInfo.InvariantCulture)};" +
+                $"{features.DiferencaDaMedia.ToString("F4", CultureInfo.InvariantCulture)};" +
+                $"{features.ZScore.ToString("F4", CultureInfo.InvariantCulture)};" +
+                $"{features.AmplitudeJanela.ToString("F4", CultureInfo.InvariantCulture)}"
             );
+            
         }
 
         File.WriteAllLines(caminhoSaida, linhasSaida);
@@ -67,34 +71,52 @@ public static class CsvFeatureGenerator
         return GerarFeatures(historico, historico.Count - 1);
     }
 
-    private static SensorData GerarFeatures(List<LeituraBruta> historico, int index)
+ private static SensorData GerarFeatures(List<LeituraBruta> historico, int index)
+{
+    var valorAtual = historico[index].Valor;
+
+    var inicioJanela = Math.Max(0, index - 4);
+
+    var janela = historico
+        .Skip(inicioJanela)
+        .Take(index - inicioJanela + 1)
+        .Select(x => x.Valor)
+        .ToList();
+
+    var media = janela.Average();
+
+    var variacao = index == 0
+        ? 0
+        : valorAtual - historico[index - 1].Valor;
+
+    var min = janela.Min();
+    var max = janela.Max();
+
+    var desvioPadrao = CalcularDesvioPadrao(janela);
+
+    var diferencaDaMedia = valorAtual - media;
+
+    var amplitudeJanela = max - min;
+
+    var zScore = desvioPadrao == 0
+        ? 0
+        : diferencaDaMedia / desvioPadrao;
+
+    return new SensorData
     {
-        var valorAtual = historico[index].Valor;
+        ValorAtual = valorAtual,
+        MediaMovel5 = media,
+        Variacao = variacao,
 
-        var inicioJanela = Math.Max(0, index - 4);
+        MinJanela5 = min,
+        MaxJanela5 = max,
+        DesvioPadrao5 = desvioPadrao,
 
-        var janela = historico
-            .Skip(inicioJanela)
-            .Take(index - inicioJanela + 1)
-            .Select(x => x.Valor)
-            .ToList();
-
-        var media = janela.Average();
-
-        var variacao = index == 0
-            ? 0
-            : valorAtual - historico[index - 1].Valor;
-
-        return new SensorData
-        {
-            ValorAtual = valorAtual,
-            MediaMovel5 = media,
-            Variacao = variacao,
-            MinJanela5 = janela.Min(),
-            MaxJanela5 = janela.Max(),
-            DesvioPadrao5 = CalcularDesvioPadrao(janela)
-        };
-    }
+        DiferencaDaMedia = diferencaDaMedia,
+        ZScore = zScore,
+        AmplitudeJanela = amplitudeJanela
+    };
+}
 
     private static float CalcularDesvioPadrao(List<float> valores)
     {
