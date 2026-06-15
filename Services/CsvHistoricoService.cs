@@ -1,8 +1,16 @@
 public class CsvHistoricoService : IHistoricoService
 {
-    public List<LeituraBruta> BuscarHistorico(string tagName)
+    public List<LeituraBruta> BuscarHistorico(string tagName, string tipoTag)
+{
+    var caminhoCsv = tipoTag.ToLower() switch
     {
-        // Por enquanto ignora o tagName e usa um CSV fake/local
-        return CsvFeatureGenerator.CarregarHistorico("Data/sensores.csv");
-    }
+        "temperatura" => "Data/temperatura.csv",
+        "pressao" => "Data/pressao.csv",
+        "corrente" => "Data/corrente.csv",
+        _ => throw new Exception($"Tipo de tag inválido: {tipoTag}")
+    };
+
+    return CsvFeatureGenerator.CarregarHistorico(caminhoCsv);
 }
+}
+

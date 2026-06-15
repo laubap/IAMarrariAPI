@@ -1,23 +1,31 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Cria a pasta dos modelos caso não exista
+// Cria a pasta onde os modelos treinados serão salvos
 Directory.CreateDirectory("ModelsML");
 
-// Treina um novo modelo usando o CSV atual
-var detectorTreino = new AnomalyDetectionService();
-
-CsvFeatureGenerator.Gerar(
-    caminhoEntrada: "Data/sensores.csv",
-    caminhoSaida: "Data/sensores_enriquecido.csv"
+// Treina os modelos por tipo de tag
+TreinarModelo(
+    entrada: "Data/temperatura.csv",
+    enriquecido: "Data/temperatura_enriquecido.csv",
+    modelo: "ModelsML/modelo_temperatura.zip"
 );
 
-detectorTreino.Treinar("Data/sensores_enriquecido.csv");
-detectorTreino.SalvarModelo("ModelsML/modelo_tag.zip");
+TreinarModelo(
+    entrada: "Data/pressao.csv",
+    enriquecido: "Data/pressao_enriquecido.csv",
+    modelo: "ModelsML/modelo_pressao.zip"
+);
+
+TreinarModelo(
+    entrada: "Data/corrente.csv",
+    enriquecido: "Data/corrente_enriquecido.csv",
+    modelo: "ModelsML/modelo_corrente.zip"
+);
 
 // Controllers da API
 builder.Services.AddControllers();
 
-// Serviços
+// Serviços usados pela API
 builder.Services.AddSingleton<IHistoricoService, CsvHistoricoService>();
 builder.Services.AddSingleton<PredictionService>();
 
@@ -39,3 +47,16 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+static void TreinarModelo(string entrada, string enriquecido, string modelo)
+{
+    var detector = new AnomalyDetectionService();
+
+    CsvFeatureGenerator.Gerar(
+        caminhoEntrada: entrada,
+        caminhoSaida: enriquecido
+    );
+
+    detector.Treinar(enriquecido);
+    detector.SalvarModelo(modelo);
+}

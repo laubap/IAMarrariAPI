@@ -59,3 +59,4 @@ C:\Users\Laura Marrari\IAApi\obj\Debug\net10.0\refint\IAApi.dll
 C:\Users\Laura Marrari\IAApi\obj\Debug\net10.0\IAApi.pdb
 C:\Users\Laura Marrari\IAApi\obj\Debug\net10.0\IAApi.genruntimeconfig.cache
 C:\Users\Laura Marrari\IAApi\obj\Debug\net10.0\ref\IAApi.dll
+C:\Users\Laura Marrari\IAApi\obj\Debug\net10.0\IAApi.sourcelink.json
