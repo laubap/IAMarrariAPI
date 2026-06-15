@@ -208,3 +208,7 @@ A evolução prevista para o projeto é a integração com a biblioteca do Viewe
 Laura Marrari Baptístini
 
 Projeto desenvolvido para estudo e aplicação de Inteligência Artificial em monitoramento industrial.
+
+## Teste da API:
+http://localhost:5145/swagger/index.html
+
