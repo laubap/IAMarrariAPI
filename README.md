@@ -1,163 +1,72 @@
-# IAApi - Detecção de Anomalias para Tags Industriais
+# IA Marrari API
 
-## Visão Geral
+## Sobre o Projeto
 
-A IAApi é uma API REST desenvolvida em C# utilizando ASP.NET Core e ML.NET com o objetivo de detectar comportamentos anômalos em tags de sistemas industriais.
+A IA Marrari API é uma API desenvolvida em ASP.NET Core utilizando ML.NET para detecção de anomalias em dados industriais.
 
-A solução foi projetada para integrar-se ao ecossistema do PSI4, permitindo que leituras de sensores sejam analisadas automaticamente através de modelos de Machine Learning.
+O objetivo da solução é permitir que sistemas supervisórios, historiadores e plataformas de monitoramento identifiquem automaticamente comportamentos anormais em tags de processo, auxiliando operadores e equipes de manutenção na tomada de decisão.
 
----
+Atualmente o projeto possui modelos específicos para diferentes categorias de tags:
 
-# Objetivos
+* Temperatura
+* Pressão
+* Corrente
 
-O projeto tem como objetivo:
-
-* Detectar anomalias em leituras de tags industriais;
-* Fornecer uma API simples para integração com sistemas existentes;
-* Permitir futura integração com a biblioteca utilizada pelo Viewer do PSI4;
-* Possibilitar expansão para múltiplos modelos e tipos de análise.
+Cada categoria possui seu próprio modelo de Machine Learning treinado de forma independente.
 
 ---
 
-# Arquitetura
+## Arquitetura Atual
 
-Fluxo atual da aplicação:
+Fluxo de funcionamento:
 
-Cliente / Sistema Externo
-
+```text
+Cliente
 ↓
-
-POST /api/anomalias/tag
-
+Seleciona Tag
 ↓
-
-AnomaliaController
-
+Informa Tipo da Tag
 ↓
-
-PredictionService
-
+API busca histórico
 ↓
-
-IHistoricoService
-
+Calcula Features
 ↓
-
-CsvHistoricoService
-
+Modelo correspondente
 ↓
-
-CsvFeatureGenerator
-
+Detecção de Anomalia
 ↓
+Resposta
+```
 
-AnomalyDetectionService
+Exemplo:
 
+```text
+TipoTag = temperatura
 ↓
+modelo_temperatura.zip
 
-modelo_tag.zip
-
+TipoTag = pressao
 ↓
+modelo_pressao.zip
 
-Resposta JSON
-
----
-
-# Componentes
-
-## Program.cs
-
-Responsável por:
-
-* Inicialização da API;
-* Configuração dos serviços;
-* Registro de dependências;
-* Configuração do Swagger;
-* Inicialização do modelo de Machine Learning.
-
----
-
-## AnomaliaController
-
-Responsável por:
-
-* Receber requisições HTTP;
-* Validar entrada de dados;
-* Encaminhar requisições para o PredictionService;
-* Retornar respostas para o cliente.
-
-Endpoint disponível:
-
-```http
-POST /api/anomalias/tag
+TipoTag = corrente
+↓
+modelo_corrente.zip
 ```
 
 ---
 
-## PredictionService
+## Tecnologias Utilizadas
 
-Responsável por:
-
-* Orquestrar o fluxo de análise;
-* Buscar histórico da tag;
-* Gerar features;
-* Executar o modelo ML.NET;
-* Retornar o resultado da análise.
-
----
-
-## IHistoricoService
-
-Interface responsável por abstrair a origem dos dados históricos.
-
-Objetivo:
-
-Permitir que a API obtenha histórico de diferentes fontes sem alterar a lógica principal.
-
----
-
-## CsvHistoricoService
-
-Implementação temporária do IHistoricoService.
-
-Atualmente utiliza arquivos CSV locais para simular dados históricos.
-
-No futuro será substituído por uma implementação baseada na biblioteca do Viewer.
-
----
-
-## CsvFeatureGenerator
-
-Responsável por transformar leituras brutas em features utilizadas pelo modelo.
-
-Features calculadas:
-
-* Valor Atual
-* Média Móvel
-* Variação
-* Valor Mínimo
-* Valor Máximo
-* Desvio Padrão
-
----
-
-## AnomalyDetectionService
-
-Responsável por:
-
-* Treinamento do modelo;
-* Salvamento do modelo (.zip);
-* Carregamento do modelo;
-* Execução de previsões.
-
-Tecnologia utilizada:
-
+* .NET 10
+* ASP.NET Core Web API
 * ML.NET
-* Randomized PCA
+* Swagger
+* C#
 
 ---
 
-# Estrutura do Projeto
+## Estrutura do Projeto
 
 ```text
 IAApi
@@ -165,116 +74,137 @@ IAApi
 ├── Controllers
 │   └── AnomaliaController.cs
 │
-├── Models
-│   ├── AnomaliaRequest.cs
-│   ├── AnomaliaResponse.cs
-│   ├── LeituraBruta.cs
-│   ├── SensorData.cs
-│   └── SensorPrediction.cs
-│
 ├── Services
-│   ├── IHistoricoService.cs
+│   ├── PredictionService.cs
 │   ├── CsvHistoricoService.cs
 │   ├── CsvFeatureGenerator.cs
-│   ├── PredictionService.cs
 │   └── AnomalyDetectionService.cs
 │
+├── Models
+│   ├── SensorData.cs
+│   ├── SensorPrediction.cs
+│   ├── AnomaliaRequest.cs
+│   └── AnomaliaResponse.cs
+│
 ├── Data
-│   ├── sensores.csv
-│   └── sensores_enriquecido.csv
+│   ├── temperatura.csv
+│   ├── pressao.csv
+│   └── corrente.csv
 │
-├── ModelsML
-│   └── modelo_tag.zip
-│
-└── Program.cs
+└── ModelsML
+    ├── modelo_temperatura.zip
+    ├── modelo_pressao.zip
+    └── modelo_corrente.zip
 ```
 
 ---
 
-# Exemplo de Requisição
+## Features Calculadas
 
-```json
-{
-  "clienteId": "cliente01",
-  "tagName": "TemperaturaTanque01",
-  "dataHora": "2026-06-12T14:01:00",
-  "valor": 66.5
-}
-```
+Antes de realizar a previsão, o sistema gera automaticamente características estatísticas a partir do histórico da tag.
 
----
+Atualmente são calculadas:
 
-# Exemplo de Resposta
+* Valor Atual
+* Média Móvel
+* Variação
+* Valor Mínimo da Janela
+* Valor Máximo da Janela
+* Desvio Padrão
 
-```json
-{
-  "clienteId": "cliente01",
-  "tagName": "TemperaturaTanque01",
-  "ehAnomalia": false,
-  "score": 0.15,
-  "mensagem": "Comportamento normal na tag TemperaturaTanque01."
-}
-```
+Essas informações são utilizadas como entrada para o modelo de Machine Learning.
 
 ---
 
-# Treinamento do Modelo
+## Treinamento dos Modelos
 
-Fluxo de treinamento:
+Cada modelo é treinado utilizando históricos pertencentes à sua categoria.
+
+Exemplos:
+
+### Modelo de Temperatura
+
+Treinado com históricos de tags de temperatura.
+
+Arquivo gerado:
 
 ```text
-sensores.csv
-↓
-CsvFeatureGenerator
-↓
-sensores_enriquecido.csv
-↓
-Treinamento ML.NET
-↓
-modelo_tag.zip
+ModelsML/modelo_temperatura.zip
 ```
 
-O modelo atualmente é treinado utilizando dados simulados armazenados em CSV.
+### Modelo de Pressão
 
-No futuro, o treinamento será realizado utilizando dados históricos reais obtidos através da biblioteca utilizada pelo Viewer do PSI4.
+Treinado com históricos de tags de pressão.
+
+Arquivo gerado:
+
+```text
+ModelsML/modelo_pressao.zip
+```
+
+### Modelo de Corrente
+
+Treinado com históricos de tags de corrente.
+
+Arquivo gerado:
+
+```text
+ModelsML/modelo_corrente.zip
+```
 
 ---
 
-# Evolução Planejada
+## Endpoint Principal
 
-## Versão Atual
+### Detectar Anomalia
 
-* API REST funcional;
-* Modelo de detecção de anomalias por tag;
-* Treinamento via CSV;
-* Persistência de modelo em ZIP;
-* Swagger para testes.
+```http
+POST /api/anomalias/tag
+```
+
+Exemplo de requisição:
+
+```json
+{
+  "clienteId": "cliente01",
+  "tagName": "PT100_Tanque01",
+  "tipoTag": "temperatura",
+  "dataHora": "2026-06-12T14:01:00",
+  "valor": 80.0
+}
+```
+
+Exemplo de resposta:
+
+```json
+{
+  "clienteId": "cliente01",
+  "tagName": "PT100_Tanque01",
+  "tipoTag": "temperatura",
+  "ehAnomalia": true,
+  "score": 0.87,
+  "mensagem": "Anomalia detectada na tag PT100_Tanque01."
+}
+```
+
+---
 
 ## Próximos Passos
 
-* Integração com biblioteca do Viewer;
-* Consulta de histórico em tempo real;
-* Treinamento com dados reais;
-* Cache de histórico;
-* Suporte a múltiplos modelos;
-* Detecção de anomalias por processo (multitag);
-* Dashboard de monitoramento.
+A versão atual utiliza arquivos CSV para simular históricos de processo.
+
+A evolução prevista para o projeto é a integração com a biblioteca do Viewer, permitindo:
+
+* Consulta de histórico real das tags
+* Busca automática de dados históricos
+* Treinamento com dados reais de processo
+* Classificação automática de tags por tipo ou unidade de engenharia
+* Aprimoramento contínuo dos modelos de Machine Learning
 
 ---
 
-# Tecnologias Utilizadas
+## Autor
 
-* .NET 9
-* ASP.NET Core
-* ML.NET
-* Swagger
-* C#
-* REST API
+Laura Marrari Baptístini
 
----
-
-# Autor
-
-Laura Baptistini
-
-Projeto desenvolvido como estudo e prova de conceito para aplicação de Inteligência Artificial em sistemas industriais e monitoramento de tags.
+Projeto desenvolvido para estudo e aplicação de Inteligência Artificial em monitoramento industrial.
