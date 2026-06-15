@@ -1,0 +1,6 @@
+@IAApi_HostAddress = http://localhost:5145
+
+GET {{IAApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
