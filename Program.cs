@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Cria a pasta onde os modelos treinados serão salvos
@@ -25,6 +27,10 @@ TreinarModelo(
 // Controllers da API
 builder.Services.AddControllers();
 
+//Banco Sqlite
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite("Data Source=ia_config.db"));
+
 // Serviços usados pela API
 builder.Services.AddSingleton<IHistoricoService, CsvHistoricoService>();
 builder.Services.AddSingleton<PredictionService>();
@@ -32,6 +38,8 @@ builder.Services.AddSingleton<PredictionService>();
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 var app = builder.Build();
 
