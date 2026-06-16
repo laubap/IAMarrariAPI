@@ -1,0 +1,15 @@
+# Build
+bin/
+obj/
+
+# Banco local
+*.db
+
+# Modelos treinados
+ModelsML/*.zip
+
+# CSVs gerados automaticamente
+Data/*_enriquecido.csv
+
+# Arquivos do Visual Studio
+.vs/
