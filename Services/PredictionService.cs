@@ -1,20 +1,36 @@
 public class PredictionService
 {
     private readonly IHistoricoService _historicoService;
+    private readonly AppDbContext _context;
 
-    public PredictionService(IHistoricoService historicoService)
+    public PredictionService(
+        IHistoricoService historicoService,
+        AppDbContext context
+    )
     {
         _historicoService = historicoService;
+        _context = context;
     }
 
     public AnomaliaResponse Detectar(AnomaliaRequest request)
-    {    //aqui é onde é escolhido o modelo de ML com base no tipo de TAG, oq acontece é como nao temos ainda o tipo de tag no server o proprio cliente tera q informar q tipo de tag é 
-        var caminhoModelo = request.TipoTag.ToLower() switch
+    {
+        var config = _context.TagsIaConfig
+            .FirstOrDefault(x =>
+                x.ClienteId == request.ClienteId &&
+                x.TagName == request.TagName &&
+                x.IaAtiva);
+
+        if (config == null)
+            throw new Exception($"IA não configurada para a tag {request.TagName} do cliente {request.ClienteId}.");
+
+        var tipoTag = config.TipoTag.ToLower();
+
+        var caminhoModelo = tipoTag switch
         {
             "temperatura" => "ModelsML/modelo_temperatura.zip",
             "pressao" => "ModelsML/modelo_pressao.zip",
             "corrente" => "ModelsML/modelo_corrente.zip",
-            _ => throw new Exception($"Tipo de tag inválido: {request.TipoTag}")
+            _ => throw new Exception($"Tipo de tag inválido: {tipoTag}")
         };
 
         var detector = new AnomalyDetectionService();
@@ -22,7 +38,7 @@ public class PredictionService
 
         var historico = _historicoService.BuscarHistorico(
             request.TagName,
-            request.TipoTag
+            tipoTag
         );
 
         var entrada = CsvFeatureGenerator.GerarFeaturesParaNovaLeitura(
@@ -37,7 +53,7 @@ public class PredictionService
         {
             ClienteId = request.ClienteId,
             TagName = request.TagName,
-            TipoTag = request.TipoTag,
+            TipoTag = tipoTag,
             EhAnomalia = resultado.EhAnomalia,
             Score = resultado.Score,
             Mensagem = resultado.EhAnomalia

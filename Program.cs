@@ -32,8 +32,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=ia_config.db"));
 
 // Serviços usados pela API
-builder.Services.AddSingleton<IHistoricoService, CsvHistoricoService>();
-builder.Services.AddSingleton<PredictionService>();
+builder.Services.AddSingleton<IHistoricoService, BridgeHistoricoService>();
+builder.Services.AddScoped<PredictionService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
