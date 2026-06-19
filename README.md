@@ -245,11 +245,11 @@ http://localhost:5145/swagger
 * Retreinamento automático agendado
 * Dashboard de monitoramento
 * Notificações por e-mail
-* Integração com Microsoft Teams
 * Agrupamento automático de tags por comportamento
 * Implementação de Machine Learning não supervisionado
 * Histórico de anomalias detectadas
-* Dashboard de saúde das tags
+* Implementação com o software da Marrari
+* Cliente obtido através do usuário autentificado no sistema
 
 ---
 
