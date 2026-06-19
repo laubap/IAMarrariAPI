@@ -21,7 +21,6 @@ public class TagConfigController : ControllerBase
 
         if (existente != null)
         {
-            existente.TipoTag = config.TipoTag;
             existente.IaAtiva = config.IaAtiva;
 
             _context.SaveChanges();

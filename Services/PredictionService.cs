@@ -1,14 +1,9 @@
 public class PredictionService
 {
-    private readonly IHistoricoService _historicoService;
     private readonly AppDbContext _context;
 
-    public PredictionService(
-        IHistoricoService historicoService,
-        AppDbContext context
-    )
+    public PredictionService(AppDbContext context)
     {
-        _historicoService = historicoService;
         _context = context;
     }
 
@@ -23,42 +18,42 @@ public class PredictionService
         if (config == null)
             throw new Exception($"IA não configurada para a tag {request.TagName} do cliente {request.ClienteId}.");
 
-        var tipoTag = config.TipoTag.ToLower();
+        var perfil = _context.PerfisIa
+            .FirstOrDefault(x =>
+                x.ClienteId == request.ClienteId &&
+                x.TagName == request.TagName);
 
-        var caminhoModelo = tipoTag switch
-        {
-            "temperatura" => "ModelsML/modelo_temperatura.zip",
-            "pressao" => "ModelsML/modelo_pressao.zip",
-            "corrente" => "ModelsML/modelo_corrente.zip",
-            _ => throw new Exception($"Tipo de tag inválido: {tipoTag}")
-        };
+        if (perfil == null)
+            throw new Exception($"Perfil da tag {request.TagName} ainda não foi treinado. Execute o treinamento de perfil antes da detecção.");
 
-        var detector = new AnomalyDetectionService();
-        detector.CarregarModelo(caminhoModelo);
+        var limiteInferior = perfil.Media - (3 * perfil.DesvioPadrao);
+        var limiteSuperior = perfil.Media + (3 * perfil.DesvioPadrao);
 
-        var historico = _historicoService.BuscarHistorico(
-            request.TagName,
-            tipoTag
-        );
+        var ehAnomalia =
+            request.Valor < limiteInferior ||
+            request.Valor > limiteSuperior;
 
-        var entrada = CsvFeatureGenerator.GerarFeaturesParaNovaLeitura(
-            historico,
-            request.DataHora,
-            request.Valor
-        );
+        var distanciaDaMedia = Math.Abs(request.Valor - perfil.Media);
 
-        var resultado = detector.Prever(entrada);
+        var score = perfil.DesvioPadrao > 0
+            ? distanciaDaMedia / perfil.DesvioPadrao
+            : 0;
 
         return new AnomaliaResponse
         {
             ClienteId = request.ClienteId,
             TagName = request.TagName,
-            TipoTag = tipoTag,
-            EhAnomalia = resultado.EhAnomalia,
-            Score = resultado.Score,
-            Mensagem = resultado.EhAnomalia
-                ? $"Anomalia detectada na tag {request.TagName}."
-                : $"Comportamento normal na tag {request.TagName}."
+
+            // Como agora não dependemos mais de temperatura/pressão/corrente,
+            // usamos um tipo genérico para representar a nova arquitetura.
+            TipoTag = "perfil-comportamental",
+
+            EhAnomalia = ehAnomalia,
+            Score = (float)score,
+
+            Mensagem = ehAnomalia
+                ? $"Anomalia detectada na tag {request.TagName}. Valor fora do perfil comportamental esperado."
+                : $"Comportamento normal na tag {request.TagName}. Valor dentro do perfil esperado."
         };
     }
 }
