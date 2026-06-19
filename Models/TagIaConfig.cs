@@ -7,7 +7,7 @@ public class TagIaConfig
 
     public string TagName {get; set;} = "";
 
-    public string TipoTag {get; set;} = "";
+    public string? TipoTag {get; set;} = "";
 
     public bool IaAtiva {get; set;} = true;
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IAApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260618180707_AddCamposPerfilTag")]
+    partial class AddCamposPerfilTag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
@@ -84,15 +87,6 @@ namespace IAApi.Migrations
                     b.Property<string>("TagName")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("TotalOutliersRemovidos")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TotalRegistrosHistorico")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TotalRegistrosUsados")
-                        .HasColumnType("INTEGER");
 
                     b.Property<double>("VariacaoMedia")
                         .HasColumnType("REAL");

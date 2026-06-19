@@ -27,7 +27,7 @@ TreinarModelo(
 // Controllers da API
 builder.Services.AddControllers();
 
-//Banco Sqlite
+// Banco Sqlite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=ia_config.db"));
 
@@ -35,11 +35,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddSingleton<IHistoricoService, BridgeHistoricoService>();
 builder.Services.AddScoped<PredictionService>();
 
+// NOVO: Serviço que treina/calcula o perfil estatístico de cada tag
+builder.Services.AddScoped<PerfilTagService>();
+
+//limpeza do historico caso tenha algum valor desviando muito o padrão 
+builder.Services.AddScoped<HistoricoLimpezaService>();
+
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 
 var app = builder.Build();
 

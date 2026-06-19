@@ -3,57 +3,107 @@ using System.Text.Json;
 
 public class BridgeHistoricoService : IHistoricoService
 {
-    private readonly HttpClient _httpClient = new();
+    private readonly HttpClient _httpClient = new()
+    {
+        Timeout = TimeSpan.FromSeconds(15)
+    };
+
+    private readonly IConfiguration _configuration;
+
+    public BridgeHistoricoService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
 
     public List<LeituraBruta> BuscarHistorico(string tagName, string tipoTag)
     {
-        var url = $"http://localhost:5001/historico?tagName={Uri.EscapeDataString(tagName)}&horas=2";
+        var baseUrl =
+            _configuration["Bridge:BaseUrl"]
+            ?? "http://localhost:5001";
+
+        var horas =
+            _configuration["Bridge:HorasHistorico"]
+            ?? "24";
+
+        var url =
+            $"{baseUrl}/historico?tagName={Uri.EscapeDataString(tagName)}&horas={horas}";
 
         Console.WriteLine("================================");
         Console.WriteLine("BUSCANDO HISTÓRICO NO BRIDGE");
         Console.WriteLine("Tag: " + tagName);
-        Console.WriteLine("TipoTag: " + tipoTag);
+        Console.WriteLine("Horas configuradas: " + horas);
         Console.WriteLine("URL: " + url);
         Console.WriteLine("================================");
 
-        var json = _httpClient.GetStringAsync(url).Result;
+        string json;
 
-        Console.WriteLine("Resposta bruta do Bridge:");
-        Console.WriteLine(json);
-
-        var dados = JsonSerializer.Deserialize<List<BridgeHistoricoItem>>(
-            json,
-            new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }
-        );
-
-        Console.WriteLine($"Histórico recebido: {dados?.Count ?? 0} registros");
-
-        if (dados != null && dados.Any())
+        try
         {
+            json = _httpClient.GetStringAsync(url).Result;
+        }
+        catch (AggregateException ex) when (ex.InnerException is HttpRequestException)
+        {
+            throw new Exception(
+                $"Não foi possível conectar ao Bridge ({baseUrl}). Verifique se ele está rodando.");
+        }
+        catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+        {
+            throw new Exception(
+                "Tempo limite excedido ao consultar o Bridge.");
+        }
+        catch (HttpRequestException)
+        {
+            throw new Exception(
+                "Erro ao consultar o Bridge/PowerServer.");
+        }
+
+        try
+        {
+            var dados = JsonSerializer.Deserialize<List<BridgeHistoricoItem>>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            if (dados == null || dados.Count == 0)
+            {
+                throw new Exception(
+                    $"Nenhum histórico encontrado para a tag '{tagName}'.");
+            }
+
+            Console.WriteLine($"Histórico recebido: {dados.Count} registros");
+
             Console.WriteLine("Primeiros registros recebidos:");
 
             foreach (var item in dados.Take(5))
             {
-                Console.WriteLine($"{item.DataHora:yyyy-MM-dd HH:mm:ss} -> {item.Valor}");
+                Console.WriteLine(
+                    $"{item.DataHora:yyyy-MM-dd HH:mm:ss} -> {item.Valor}");
             }
+
+            var resultado = dados
+                .Select(x => new LeituraBruta
+                {
+                    DataHora = x.DataHora,
+                    Valor = Convert.ToSingle(
+                        x.Valor,
+                        CultureInfo.InvariantCulture)
+                })
+                .ToList();
+
+            Console.WriteLine(
+                $"Histórico convertido para IA: {resultado.Count} registros");
+
+            Console.WriteLine("================================");
+
+            return resultado;
         }
-
-        var historico = dados?
-            .Select(x => new LeituraBruta
-            {
-                DataHora = x.DataHora,
-                Valor = Convert.ToSingle(x.Valor, CultureInfo.InvariantCulture)
-            })
-            .ToList()
-            ?? new List<LeituraBruta>();
-
-        Console.WriteLine($"Histórico convertido para IA: {historico.Count} registros");
-        Console.WriteLine("================================");
-
-        return historico;
+        catch (JsonException)
+        {
+            throw new Exception(
+                "O Bridge retornou uma resposta inválida. Verifique o endpoint /historico.");
+        }
     }
 }
 

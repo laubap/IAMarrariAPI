@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IAApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260618172307_AddTagPerfilIa")]
+    partial class AddTagPerfilIa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
@@ -37,6 +40,7 @@ namespace IAApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TipoTag")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -52,9 +56,6 @@ namespace IAApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<double>("Amplitude")
-                        .HasColumnType("REAL");
 
                     b.Property<string>("ClienteId")
                         .IsRequired()
@@ -75,27 +76,9 @@ namespace IAApi.Migrations
                     b.Property<double>("Minimo")
                         .HasColumnType("REAL");
 
-                    b.Property<double>("PercentualZeros")
-                        .HasColumnType("REAL");
-
-                    b.Property<int>("QuantidadePicos")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("TagName")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("TotalOutliersRemovidos")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TotalRegistrosHistorico")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TotalRegistrosUsados")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("VariacaoMedia")
-                        .HasColumnType("REAL");
 
                     b.HasKey("Id");
 
