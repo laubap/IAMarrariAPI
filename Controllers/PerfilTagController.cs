@@ -99,6 +99,65 @@ public class PerfilTagController : ControllerBase
                 : "Valor dentro do comportamento esperado da tag."
         });
     }
+
+    [HttpGet("perfis")]
+    public IActionResult ListarPerfis()
+    {
+        var perfis = _context.PerfisIa
+            .OrderBy(x => x.ClienteId)
+            .ThenBy(x => x.TagName)
+            .Select(x => new
+            {
+                x.Id,
+                x.ClienteId,
+                x.TagName,
+                x.Media,
+                x.DesvioPadrao,
+                x.Minimo,
+                x.Maximo,
+                x.Amplitude,
+                x.PercentualZeros,
+                x.VariacaoMedia,
+                x.QuantidadePicos,
+                x.TotalRegistrosHistorico,
+                x.TotalRegistrosUsados,
+                x.TotalOutliersRemovidos,
+                x.DataTreinamento
+            })
+            .ToList();
+
+        return Ok(perfis);
+    }
+
+
+    [HttpPost("retreinar-perfil")]
+public IActionResult RetreinarPerfil([FromBody] TreinarPerfilRequest request)
+{
+    var perfil = _perfilTagService.TreinarPerfil(
+        request.ClienteId,
+        request.TagName
+    );
+
+    return Ok(new
+    {
+        mensagem = "Perfil retreinado com sucesso.",
+        perfil.ClienteId,
+        perfil.TagName,
+        perfil.Media,
+        perfil.DesvioPadrao,
+        perfil.Minimo,
+        perfil.Maximo,
+        perfil.Amplitude,
+        perfil.PercentualZeros,
+        perfil.VariacaoMedia,
+        perfil.QuantidadePicos,
+        perfil.TotalRegistrosHistorico,
+        perfil.TotalRegistrosUsados,
+        perfil.TotalOutliersRemovidos,
+        perfil.DataTreinamento
+    });
+}
+
 }
 
 public class TreinarPerfilRequest
