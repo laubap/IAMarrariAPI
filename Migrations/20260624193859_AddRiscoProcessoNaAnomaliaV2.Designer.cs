@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IAApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260624193859_AddRiscoProcessoNaAnomaliaV2")]
+    partial class AddRiscoProcessoNaAnomaliaV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
@@ -103,12 +106,6 @@ namespace IAApi.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TendenciaRisco")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TendenciaValor")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("TipoTag")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -119,166 +116,6 @@ namespace IAApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AnomaliasDetectadas");
-                });
-
-            modelBuilder.Entity("EquipamentoIa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Area")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClienteId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Criticidade")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DataAtualizacao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DataUltimaManutencao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Fabricante")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Modelo")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Observacoes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("ProcessoIaId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TipoEquipamento")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProcessoIaId");
-
-                    b.HasIndex("ClienteId", "Nome")
-                        .IsUnique();
-
-                    b.ToTable("EquipamentosIa");
-                });
-
-            modelBuilder.Entity("EquipamentoTagIa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ClienteId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("EquipamentoIaId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("PapelDaTag")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TagName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EquipamentoIaId");
-
-                    b.ToTable("EquipamentoTagsIa");
-                });
-
-            modelBuilder.Entity("ProcessoIa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Area")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClienteId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CondicaoNormal")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConsequenciasFalha")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Criticidade")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DataAtualizacao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Objetivo")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProcedimentoRecomendado")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClienteId", "Nome")
-                        .IsUnique();
-
-                    b.ToTable("ProcessosIa");
-                });
-
-            modelBuilder.Entity("ProcessoTagIa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ClienteId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PapelDaTag")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProcessoIaId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TagName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProcessoIaId");
-
-                    b.ToTable("ProcessoTagsIa");
                 });
 
             modelBuilder.Entity("TagContextoIa", b =>
@@ -482,50 +319,9 @@ namespace IAApi.Migrations
                     b.Navigation("AnomaliaDetectada");
                 });
 
-            modelBuilder.Entity("EquipamentoIa", b =>
-                {
-                    b.HasOne("ProcessoIa", "ProcessoIa")
-                        .WithMany()
-                        .HasForeignKey("ProcessoIaId");
-
-                    b.Navigation("ProcessoIa");
-                });
-
-            modelBuilder.Entity("EquipamentoTagIa", b =>
-                {
-                    b.HasOne("EquipamentoIa", "EquipamentoIa")
-                        .WithMany("Tags")
-                        .HasForeignKey("EquipamentoIaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EquipamentoIa");
-                });
-
-            modelBuilder.Entity("ProcessoTagIa", b =>
-                {
-                    b.HasOne("ProcessoIa", "ProcessoIa")
-                        .WithMany("Tags")
-                        .HasForeignKey("ProcessoIaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProcessoIa");
-                });
-
             modelBuilder.Entity("AnomaliaDetectada", b =>
                 {
                     b.Navigation("Dependencias");
-                });
-
-            modelBuilder.Entity("EquipamentoIa", b =>
-                {
-                    b.Navigation("Tags");
-                });
-
-            modelBuilder.Entity("ProcessoIa", b =>
-                {
-                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

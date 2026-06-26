@@ -74,23 +74,44 @@ public class BridgeHistoricoService : IHistoricoService
 
             Console.WriteLine($"Histórico recebido: {dados.Count} registros");
 
-            Console.WriteLine("Primeiros registros recebidos:");
+            var resultado = new List<LeituraBruta>();
 
-            foreach (var item in dados.Take(5))
+            foreach (var item in dados)
             {
-                Console.WriteLine(
-                    $"{item.DataHora:yyyy-MM-dd HH:mm:ss} -> {item.Valor}");
-            }
+                float valor;
 
-            var resultado = dados
-                .Select(x => new LeituraBruta
+                if (item.Valor.ValueKind == JsonValueKind.Number)
                 {
-                    DataHora = x.DataHora,
-                    Valor = Convert.ToSingle(
-                        x.Valor,
-                        CultureInfo.InvariantCulture)
-                })
-                .ToList();
+                    valor = item.Valor.GetSingle();
+                }
+                else if (item.Valor.ValueKind == JsonValueKind.String)
+                {
+                    var texto = item.Valor.GetString();
+
+                    if (string.IsNullOrWhiteSpace(texto))
+                        valor = float.NaN;
+                    else if (texto.Equals("NaN", StringComparison.OrdinalIgnoreCase))
+                        valor = float.NaN;
+                    else if (!float.TryParse(
+                                texto,
+                                NumberStyles.Float,
+                                CultureInfo.InvariantCulture,
+                                out valor))
+                    {
+                        valor = float.NaN;
+                    }
+                }
+                else
+                {
+                    valor = float.NaN;
+                }
+
+                resultado.Add(new LeituraBruta
+                {
+                    DataHora = item.DataHora,
+                    Valor = valor
+                });
+            }
 
             Console.WriteLine(
                 $"Histórico convertido para IA: {resultado.Count} registros");
@@ -99,10 +120,10 @@ public class BridgeHistoricoService : IHistoricoService
 
             return resultado;
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
             throw new Exception(
-                "O Bridge retornou uma resposta inválida. Verifique o endpoint /historico.");
+                $"O Bridge retornou uma resposta inválida. Erro JSON: {ex.Message}. Resposta recebida: {json}");
         }
     }
 }
@@ -110,6 +131,8 @@ public class BridgeHistoricoService : IHistoricoService
 public class BridgeHistoricoItem
 {
     public DateTime DataHora { get; set; }
+
     public string TagName { get; set; } = "";
-    public float Valor { get; set; }
+
+    public JsonElement Valor { get; set; }
 }
