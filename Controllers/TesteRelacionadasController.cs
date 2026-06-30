@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
+// Controller para testar valores relacionados de tags com base no contexto cadastrado.
+// Ele busca as tags relacionadas no contexto da tag principal e retorna os valores atuais dessas tags.
 [ApiController]
 [Route("api/teste")]
 public class TesteRelacionadasController : ControllerBase
@@ -17,6 +19,8 @@ public class TesteRelacionadasController : ControllerBase
     }
 
     [HttpGet("valores-relacionados")]
+    // Endpoint: GET /api/teste/valores-relacionados?clienteId={clienteId}&tagName={tagName}
+    // Busca o contexto da tag principal, obtém suas tags relacionadas e retorna os valores atuais de todas elas.
     public async Task<IActionResult> TestarValoresRelacionados(
         string clienteId,
         string tagName)

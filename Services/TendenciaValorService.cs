@@ -1,3 +1,6 @@
+// Serviço que analisa a tendência de valor de uma tag com base no histórico
+// de leituras fornecido pelo histórico de tags. Retorna se o valor está
+// estável, em alta, em queda ou se não há histórico suficiente.
 public class TendenciaValorService
 {
     private readonly IHistoricoService _historicoService;
@@ -7,6 +10,7 @@ public class TendenciaValorService
         _historicoService = historicoService;
     }
 
+    // Analisa a tendência de valor para a tag e o tipo de tag informados.
     public ResultadoTendenciaValor Analisar(
         string tagName,
         string tipoTag)

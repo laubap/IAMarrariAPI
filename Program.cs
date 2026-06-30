@@ -63,6 +63,9 @@ builder.Services.AddScoped<InterpretacaoProcessoService>();
 // Serviço que interpreta um processo e gera uma probabilidade de falha
 builder.Services.AddScoped<FailurePredictionService>();
 
+// Serviço que analisa o equipamento e suas tags
+builder.Services.AddScoped<EquipamentoInteligenciaService>();
+
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

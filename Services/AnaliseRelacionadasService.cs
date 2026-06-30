@@ -1,3 +1,6 @@
+// Serviço responsável por analisar tags relacionadas a uma tag principal.
+// Ele consulta dependências cadastradas, obtém valores atuais das tags dependentes
+// e compara com seus perfis para detectar anomalias e impactar o resumo.
 public class AnaliseRelacionadasService
 {
     private readonly AppDbContext _context;
@@ -11,6 +14,9 @@ public class AnaliseRelacionadasService
         _bridgeValorAtualService = bridgeValorAtualService;
     }
 
+    // Analisa as tags relacionadas à tag principal informada.
+    // Retorna um resumo com o total de dependências, anomalias detectadas,
+    // dependências de alto impacto e resultados detalhados por tag.
     public async Task<AnaliseRelacionadasResultado> Analisar(
         string clienteId,
         string tagName)
@@ -157,6 +163,8 @@ public class AnaliseRelacionadasService
         };
     }
 
+    // Cria o objeto base de resultado para uma tag dependente,
+    // preenchendo metadados de relação e contexto.
     private ResultadoTagRelacionada CriarResultadoBase(
         string tagDependente,
         TagDependenciaIa dependencia,
@@ -187,6 +195,7 @@ public class AnaliseRelacionadasService
         };
     }
 
+    // Monta uma mensagem de resumo baseada na quantidade de anomalias e impacto alto.
     private string MontarResumo(
         int qtdAnomalias,
         int qtdImpactoAlto,

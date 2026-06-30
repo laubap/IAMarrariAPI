@@ -1,41 +1,54 @@
 using Microsoft.AspNetCore.Mvc;
 
-// Controller que fornece dados de dashboard para um processo.
-// Ele combina a análise do processo com a previsão de falhas para retornar
-// um resumo de saúde, risco e tags críticas.
+// Controller que fornece dados agregados para o dashboard de um equipamento.
+// Ele combina análise de inteligência do equipamento com previsão de falhas
+// para retornar um resumo completo de saúde e risco.
 [ApiController]
-[Route("api/processos-dashboard")]
-public class ProcessoDashboardController : ControllerBase
+[Route("api/equipamentos-dashboard")]
+public class EquipamentoDashboardController : ControllerBase
 {
-    private readonly ProcessoInteligenciaService _processoInteligenciaService;
+    private readonly EquipamentoInteligenciaService _equipamentoInteligenciaService;
     private readonly FailurePredictionService _failurePredictionService;
 
-    public ProcessoDashboardController(
-        ProcessoInteligenciaService processoInteligenciaService,
+    public EquipamentoDashboardController(
+        EquipamentoInteligenciaService equipamentoInteligenciaService,
         FailurePredictionService failurePredictionService)
     {
-        _processoInteligenciaService = processoInteligenciaService;
+        _equipamentoInteligenciaService = equipamentoInteligenciaService;
         _failurePredictionService = failurePredictionService;
     }
 
-    [HttpGet("{processoId}")]
-    // Endpoint: GET /api/processos-dashboard/{processoId}
-    // Retorna um objeto de dashboard com métricas de saúde, tags, risco de falha,
-    // resumo e interpretação para o processo informado.
-    public async Task<IActionResult> Dashboard(int processoId)
+    [HttpGet("{equipamentoId}")]
+    // Endpoint: GET /api/equipamentos-dashboard/{equipamentoId}
+    // Retorna um modelo de dashboard com análise do equipamento, saúde,
+    // métricas de tags, processos, previsão de falha e tags críticas.
+    public async Task<IActionResult> Dashboard(int equipamentoId)
     {
         try
         {
-            var analise = await _processoInteligenciaService.AnalisarProcesso(processoId);
+            var analise = await _equipamentoInteligenciaService.AnalisarEquipamento(equipamentoId);
 
-            var falha = _failurePredictionService.Calcular(analise);
+            var processoFake = new AnaliseProcessoResultado
+            {
+                ScoreSaude = analise.ScoreSaude,
+                TotalTagsAnomalas = analise.TotalTagsAnomalas,
+                TotalTagsSemPerfil = analise.TotalTagsSemPerfil,
+                Tags = analise.Tags
+            };
+
+            var falha = _failurePredictionService.Calcular(processoFake);
 
             var dashboard = new
             {
-                processoId = analise.ProcessoId,
-                processo = analise.NomeProcesso,
+                equipamentoId = analise.EquipamentoId,
+                equipamento = analise.Nome,
+                descricao = analise.Descricao,
                 area = analise.Area,
+                tipoEquipamento = analise.TipoEquipamento,
                 criticidade = analise.Criticidade,
+                fabricante = analise.Fabricante,
+                modelo = analise.Modelo,
+                dataUltimaManutencao = analise.DataUltimaManutencao,
 
                 saude = analise.ScoreSaude,
                 status = analise.ClassificacaoSaude,
@@ -45,7 +58,9 @@ public class ProcessoDashboardController : ControllerBase
                 tagsNormais = analise.Tags.Count(x => x.Status == "normal"),
                 tagsAnomalas = analise.TotalTagsAnomalas,
                 tagsSemPerfil = analise.TotalTagsSemPerfil,
-                tagsSemValorAtual = analise.Tags.Count(x => x.Status == "sem_valor_atual"),
+                tagsSemValorAtual = analise.TotalTagsSemValorAtual,
+
+                processos = analise.Processos,
 
                 probabilidadeFalha = new
                 {
@@ -54,7 +69,6 @@ public class ProcessoDashboardController : ControllerBase
                     mensagem = falha.Mensagem
                 },
 
-                resumo = analise.Resumo,
                 interpretacao = analise.Interpretacao,
 
                 tagsCriticas = analise.Tags

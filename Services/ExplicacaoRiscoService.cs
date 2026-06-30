@@ -1,5 +1,10 @@
+// Serviço que gera explicações textuais para o risco de uma tag/processo.
+// Ele transforma dados de contexto, score comportamental e análise de dependências
+// em uma lista de fatores que justificam a classificação de risco.
 public class ExplicacaoRiscoService
 {
+    // Gera os fatores de risco com base em score, contexto da tag, análise de
+    // dependências relacionadas e o resultado do risco do processo.
     public List<string> GerarFatores(
         double score,
         TagContextoIa? contexto,

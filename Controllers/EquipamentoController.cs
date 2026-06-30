@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+// Controller para gerenciar equipamentos e suas tags no sistema.
+// Ele permite cadastrar equipamentos, listar todos os equipamentos
+// e vincular tags a um equipamento existente.
 [ApiController]
 [Route("api/equipamentos")]
 public class EquipamentoController : ControllerBase
@@ -13,6 +16,9 @@ public class EquipamentoController : ControllerBase
     }
 
     [HttpPost]
+    // Endpoint: POST /api/equipamentos
+    // Recebe um EquipamentoRequest para cadastrar um novo equipamento no banco.
+    // A entidade EquipamentoIa é criada e persistida em EquipamentosIa.
     public IActionResult Salvar([FromBody] EquipamentoRequest request)
     {
         var equipamento = new EquipamentoIa
@@ -25,7 +31,6 @@ public class EquipamentoController : ControllerBase
             Criticidade = request.Criticidade,
             Fabricante = request.Fabricante,
             Modelo = request.Modelo,
-            ProcessoIaId = request.ProcessoIaId,
             Observacoes = request.Observacoes,
             DataUltimaManutencao = request.DataUltimaManutencao,
             DataCriacao = DateTime.Now,
@@ -44,16 +49,22 @@ public class EquipamentoController : ControllerBase
     }
 
     [HttpGet]
+    // Endpoint: GET /api/equipamentos
+    // Retorna a lista completa de equipamentos, incluindo as tags e processos relacionados.
     public IActionResult Listar()
     {
         return Ok(
             _context.EquipamentosIa
                 .Include(x => x.Tags)
+                .Include(x => x.Processos)
                 .ToList()
         );
     }
 
     [HttpPost("{equipamentoId}/tags")]
+    // Endpoint: POST /api/equipamentos/{equipamentoId}/tags
+    // Vincula uma tag ao equipamento informado ou atualiza os dados da tag
+    // caso ela já exista para esse equipamento.
     public IActionResult VincularTag(
         int equipamentoId,
         [FromBody] EquipamentoTagRequest request)
@@ -62,12 +73,7 @@ public class EquipamentoController : ControllerBase
             .FirstOrDefault(x => x.Id == equipamentoId);
 
         if (equipamento == null)
-        {
-            return NotFound(new
-            {
-                erro = "Equipamento não encontrado."
-            });
-        }
+            return NotFound(new { erro = "Equipamento não encontrado." });
 
         var existente = _context.EquipamentoTagsIa
             .FirstOrDefault(x =>
@@ -77,6 +83,7 @@ public class EquipamentoController : ControllerBase
         if (existente != null)
         {
             existente.PapelDaTag = request.PapelDaTag;
+            existente.Escopo = request.Escopo;
 
             _context.SaveChanges();
 
@@ -85,7 +92,8 @@ public class EquipamentoController : ControllerBase
                 mensagem = "Tag do equipamento atualizada com sucesso.",
                 equipamentoId,
                 request.TagName,
-                request.PapelDaTag
+                request.PapelDaTag,
+                request.Escopo
             });
         }
 
@@ -94,7 +102,8 @@ public class EquipamentoController : ControllerBase
             EquipamentoIaId = equipamentoId,
             ClienteId = request.ClienteId,
             TagName = request.TagName,
-            PapelDaTag = request.PapelDaTag
+            PapelDaTag = request.PapelDaTag,
+            Escopo = request.Escopo
         };
 
         _context.EquipamentoTagsIa.Add(tag);
@@ -105,13 +114,15 @@ public class EquipamentoController : ControllerBase
             mensagem = "Tag vinculada ao equipamento com sucesso.",
             equipamentoId,
             tag.TagName,
-            tag.PapelDaTag
+            tag.PapelDaTag,
+            tag.Escopo
         });
     }
 }
 
 public class EquipamentoRequest
 {
+    // Dados recebidos para cadastro de um novo equipamento.
     public string ClienteId { get; set; } = "";
     public string Nome { get; set; } = "";
     public string? Descricao { get; set; }
@@ -122,12 +133,13 @@ public class EquipamentoRequest
     public string? Modelo { get; set; }
     public string? Observacoes { get; set; }
     public DateTime? DataUltimaManutencao { get; set; }
-    public int? ProcessoIaId { get; set; }
 }
 
 public class EquipamentoTagRequest
 {
+    // Dados recebidos para vincular ou atualizar uma tag de equipamento.
     public string ClienteId { get; set; } = "";
     public string TagName { get; set; } = "";
     public string? PapelDaTag { get; set; }
+    public string? Escopo { get; set; }
 }

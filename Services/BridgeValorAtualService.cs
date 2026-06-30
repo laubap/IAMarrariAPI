@@ -2,6 +2,9 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 
+// Serviço que consulta valores atuais de tags no Bridge externo.
+// Envia uma lista de tags para o endpoint /valores-atuais e converte o JSON
+// retornado em objetos de resposta com valor numérico.
 public class BridgeValorAtualService
 {
     private readonly HttpClient _httpClient = new()
@@ -9,6 +12,8 @@ public class BridgeValorAtualService
         Timeout = TimeSpan.FromSeconds(60)
     };
 
+    // Busca os valores atuais das tags informadas e retorna uma lista
+    // de respostas prontas para uso pela aplicação.
     public async Task<List<ValorAtualTagResponse>> BuscarValoresAtuais(
         List<string> tags)
     {
@@ -54,6 +59,8 @@ public class BridgeValorAtualService
         }).ToList();
     }
 
+    // Converte o valor retornado pelo Bridge de JsonElement para double.
+    // Suporta números e strings, retornando NaN para valores inválidos.
     private double ConverterValor(JsonElement valor)
     {
         if (valor.ValueKind == JsonValueKind.Number)
@@ -83,6 +90,7 @@ public class BridgeValorAtualService
     }
 }
 
+// Modelo que representa o item recebido do Bridge no endpoint /valores-atuais.
 public class ValorAtualTagBridgeItem
 {
     public string TagName { get; set; } = "";
@@ -98,6 +106,7 @@ public class ValorAtualTagBridgeItem
     public bool Encontrado { get; set; }
 }
 
+// Modelo de saída usado internamente após a conversão do valor.
 public class ValorAtualTagResponse
 {
     public string TagName { get; set; } = "";

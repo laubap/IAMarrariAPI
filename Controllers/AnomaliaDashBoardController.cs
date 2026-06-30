@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
+// Controller que fornece um resumo de anomalias detectadas para o dashboard.
+// Ele consulta o banco de dados e calcula métricas agregadas para um cliente.
 [ApiController]
 [Route("api/anomalias-dashboard")]
 public class AnomaliaDashboardController : ControllerBase
@@ -11,6 +13,9 @@ public class AnomaliaDashboardController : ControllerBase
         _context = context;
     }
 
+    // Endpoint: GET /api/anomalias-dashboard/resumo/{clienteId}
+    // Retorna resumo de anomalias do cliente informado, incluindo totais,
+    // média de risco e as tags mais problemáticas.
     [HttpGet("resumo/{clienteId}")]
     public IActionResult Resumo(string clienteId)
     {

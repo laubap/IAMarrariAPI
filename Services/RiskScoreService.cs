@@ -1,5 +1,15 @@
+// Serviço que calcula o score de risco do processo com base em anomalia da tag,
+// distância do perfil, criticidade e análise de tags relacionadas.
+// O resultado é uma pontuação de risco, uma classificação e uma mensagem.
 public class RiskScoreService
 {
+    // Calcula a pontuação de risco do processo.
+    // O cálculo considera:
+    // - presença de anomalia na tag principal
+    // - grau de desvio do perfil (score)
+    // - criticidade operacional da tag
+    // - número de tags relacionadas anômalas
+    // - impacto alto entre as dependências
     public ResultadoRiscoProcesso Calcular(
         bool ehAnomalia,
         double score,

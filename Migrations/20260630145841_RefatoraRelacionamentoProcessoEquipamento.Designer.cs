@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IAApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260630145841_RefatoraRelacionamentoProcessoEquipamento")]
+    partial class RefatoraRelacionamentoProcessoEquipamento
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
@@ -185,9 +188,6 @@ namespace IAApi.Migrations
 
                     b.Property<int>("EquipamentoIaId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Escopo")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("PapelDaTag")
                         .HasColumnType("TEXT");

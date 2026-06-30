@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
+// Controller para salvar e gerenciar o contexto de uma tag.
+// Ele persiste informações de contexto no banco e sincroniza dependências
+// relacionadas automaticamente com base nas tags relacionadas.
 [ApiController]
 [Route("api/tags/contexto")]
 public class TagContextoController : ControllerBase
@@ -13,6 +16,9 @@ public class TagContextoController : ControllerBase
     }
 
     [HttpPost]
+    // Endpoint: POST /api/tags/contexto
+    // Recebe o contexto da tag e grava ou atualiza o registro em TagsContextoIa.
+    // Também atualiza a lista de dependências de tag com base em TagsRelacionadas.
     public IActionResult SalvarContexto([FromBody] TagContextoRequest request)
     {
         var contexto = _context.TagsContextoIa
@@ -67,6 +73,8 @@ public class TagContextoController : ControllerBase
         });
     }
 
+    // Sincroniza as dependências de tag no banco de dados com base
+    // nas tags relacionadas informadas no contexto da tag.
     private void SincronizarDependencias(TagContextoRequest request)
     {
         var tagsRelacionadas = request.TagsRelacionadas ?? new List<string>();
@@ -115,6 +123,7 @@ public class TagContextoController : ControllerBase
 
 public class TagContextoRequest
 {
+    // Payload para salvar o contexto de uma tag.
     public string ClienteId { get; set; } = "";
     public string TagName { get; set; } = "";
 

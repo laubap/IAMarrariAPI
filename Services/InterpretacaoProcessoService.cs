@@ -1,5 +1,9 @@
+// Serviço que gera uma explicação textual sobre o estado de um processo.
+// Ele combina diferentes interpretações de saúde, anomalias, tags sem perfil
+// e criticidade em uma mensagem coerente.
 public class InterpretacaoProcessoService
 {
+    // Retorna a interpretação completa para o resultado da análise do processo.
     public string Interpretar(AnaliseProcessoResultado processo)
     {
         var partes = new List<string>();

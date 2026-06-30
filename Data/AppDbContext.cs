@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+// Contexto do Entity Framework para a aplicação.
+// Define os DbSets para todas as tabelas/entidades usadas pela API.
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -27,10 +29,13 @@ public class AppDbContext : DbContext
 
     public DbSet<EquipamentoTagIa> EquipamentoTagsIa { get; set; } = null!;
 
-protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
+    public DbSet<ProcessoEquipamentoIa> ProcessoEquipamentosIa { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
     base.OnModelCreating(modelBuilder);
 
+    // Índices únicos para evitar registros duplicados por cliente/tag.
     modelBuilder.Entity<TagIaConfig>()
         .HasIndex(x => new { x.ClienteId, x.TagName })
         .IsUnique();
@@ -47,14 +52,15 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
         .HasIndex(x => new { x.ClienteId, x.TagName, x.TagDependente })
         .IsUnique();
 
+    // Relações entre entidades para garantir integridade referencial.
     modelBuilder.Entity<AnomaliaDependenciaDetectada>()
         .HasOne(x => x.AnomaliaDetectada)
         .WithMany(x => x.Dependencias)
         .HasForeignKey(x => x.AnomaliaDetectadaId);
 
     modelBuilder.Entity<ProcessoIa>()
-    .HasIndex(x => new { x.ClienteId, x.Nome })
-    .IsUnique();
+        .HasIndex(x => new { x.ClienteId, x.Nome })
+        .IsUnique();
 
     modelBuilder.Entity<ProcessoTagIa>()
     .HasOne(x => x.ProcessoIa)
@@ -65,15 +71,28 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
     .HasIndex(x => new { x.ClienteId, x.Nome })
     .IsUnique();
 
-    modelBuilder.Entity<EquipamentoIa>()
-        .HasOne(x => x.ProcessoIa)
-        .WithMany()
-        .HasForeignKey(x => x.ProcessoIaId);
-
     modelBuilder.Entity<EquipamentoTagIa>()
         .HasOne(x => x.EquipamentoIa)
         .WithMany(x => x.Tags)
         .HasForeignKey(x => x.EquipamentoIaId);
+
+    modelBuilder.Entity<ProcessoEquipamentoIa>()
+    .HasOne(x => x.Processo)
+    .WithMany(x => x.Equipamentos)
+    .HasForeignKey(x => x.ProcessoIaId);
+
+    modelBuilder.Entity<ProcessoEquipamentoIa>()
+        .HasOne(x => x.Equipamento)
+        .WithMany(x => x.Processos)
+        .HasForeignKey(x => x.EquipamentoIaId);
+
+    modelBuilder.Entity<ProcessoEquipamentoIa>()
+    .HasIndex(x => new
+    {
+        x.ProcessoIaId,
+        x.EquipamentoIaId
+    })
+    .IsUnique();
 
 }
 }

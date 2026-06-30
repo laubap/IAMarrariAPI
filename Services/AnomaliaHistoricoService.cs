@@ -1,3 +1,6 @@
+// Serviço responsável por registrar o histórico de anomalias detectadas.
+// Ele grava a anomalia principal em AnomaliasDetectadas e, se houver análise
+// de tags relacionadas, também grava as dependências detectadas.
 public class AnomaliaHistoricoService
 {
     private readonly AppDbContext _context;
@@ -7,6 +10,8 @@ public class AnomaliaHistoricoService
         _context = context;
     }
 
+    // Registra uma anomalia detectada e opcionalmente persiste os dados das tags
+    // relacionadas analisadas juntamente com a anomalia.
     public void Registrar(
         string clienteId,
         string tagName,
@@ -42,6 +47,8 @@ public class AnomaliaHistoricoService
         _context.AnomaliasDetectadas.Add(anomalia);
         _context.SaveChanges();
 
+        // Se não houver análise de relacionamentos ou não houver resultados,
+        // não grava dependências de tags relacionadas.
         if (analiseRelacionadas == null || !analiseRelacionadas.Resultados.Any())
             return;
 

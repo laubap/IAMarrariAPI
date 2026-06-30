@@ -1,5 +1,10 @@
+// Serviço que interpreta o comportamento de tags dependentes em relação a uma tag principal.
+// Ele gera uma explicação textual combinando tipo de relação, mesmo equipamento, área,
+// criticidade, impacto e uma conclusão final.
 public class InterpretacaoDependenciasService
 {
+    // Monta a interpretação completa de uma tag relacionada, reunindo várias análises
+    // parciais em uma frase descritiva.
     public string Interpretar(ResultadoTagRelacionada item, TagContextoIa? contextoPrincipal)
     {
         var partes = new List<string>();

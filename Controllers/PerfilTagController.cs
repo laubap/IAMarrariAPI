@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
+// Controller para treinamento, teste e listagem de perfis de tags.
+// Ele permite treinar um modelo de perfil para uma tag, testar valores
+// contra esse perfil e exibir os perfis existentes.
 [ApiController]
 [Route("api/tags")]
 public class PerfilTagController : ControllerBase
@@ -17,6 +20,8 @@ public class PerfilTagController : ControllerBase
     }
 
     [HttpPost("treinar-perfil")]
+    // Endpoint: POST /api/tags/treinar-perfil
+    // Solicita ao serviço que treine um perfil de comportamento para a tag do cliente.
     public IActionResult TreinarPerfil([FromBody] TreinarPerfilRequest request)
     {
         var perfil = _perfilTagService.TreinarPerfil(
@@ -47,6 +52,9 @@ public class PerfilTagController : ControllerBase
     }
 
     [HttpPost("testar-perfil")]
+    // Endpoint: POST /api/tags/testar-perfil
+    // Verifica se o valor atual da tag está dentro do intervalo esperado
+    // com base no perfil já treinado. Retorna se é anomalia.
     public IActionResult TestarPerfil([FromBody] TestarPerfilRequest request)
     {
         var perfil = _context.PerfisIa
@@ -101,6 +109,8 @@ public class PerfilTagController : ControllerBase
     }
 
     [HttpGet("perfis")]
+    // Endpoint: GET /api/tags/perfis
+    // Retorna a lista de todos os perfis de tag treinados no sistema.
     public IActionResult ListarPerfis()
     {
         var perfis = _context.PerfisIa
@@ -131,7 +141,9 @@ public class PerfilTagController : ControllerBase
 
 
     [HttpPost("retreinar-perfil")]
-public IActionResult RetreinarPerfil([FromBody] TreinarPerfilRequest request)
+    // Endpoint: POST /api/tags/retreinar-perfil
+    // Reexecuta o treinamento do perfil para a tag informada.
+    public IActionResult RetreinarPerfil([FromBody] TreinarPerfilRequest request)
 {
     var perfil = _perfilTagService.TreinarPerfil(
         request.ClienteId,
@@ -162,12 +174,14 @@ public IActionResult RetreinarPerfil([FromBody] TreinarPerfilRequest request)
 
 public class TreinarPerfilRequest
 {
+    // Payload usado para treinar/retreinar o perfil de uma tag.
     public string ClienteId { get; set; } = "";
     public string TagName { get; set; } = "";
 }
 
 public class TestarPerfilRequest
 {
+    // Payload usado para testar um valor atual contra o perfil treinado.
     public string ClienteId { get; set; } = "";
     public string TagName { get; set; } = "";
     public double Valor { get; set; }

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+// Controller para gerenciar processos no sistema de IA.
+// Permite criar/atualizar processos e listar processos por cliente.
 [ApiController]
 [Route("api/processos")]
 public class ProcessoIaController : ControllerBase
@@ -13,6 +15,9 @@ public class ProcessoIaController : ControllerBase
     }
 
     [HttpPost]
+    // Endpoint: POST /api/processos
+    // Cria ou atualiza um processo para o cliente informado.
+    // Se o processo existir, atualiza seus dados e tags; caso contrário, cria novo.
     public IActionResult Salvar([FromBody] ProcessoIaRequest request)
     {
         var processo = _context.ProcessosIa
@@ -74,6 +79,8 @@ public class ProcessoIaController : ControllerBase
     }
 
     [HttpGet("{clienteId}")]
+    // Endpoint: GET /api/processos/{clienteId}
+    // Retorna os processos cadastrados para um cliente, incluindo as tags associadas.
     public IActionResult ListarPorCliente(string clienteId)
     {
         var processos = _context.ProcessosIa
@@ -87,6 +94,7 @@ public class ProcessoIaController : ControllerBase
 
 public class ProcessoIaRequest
 {
+    // Payload usado para criar ou atualizar um processo de IA.
     public string ClienteId { get; set; } = "";
     public string Nome { get; set; } = "";
 
@@ -103,6 +111,7 @@ public class ProcessoIaRequest
 
 public class ProcessoTagRequest
 {
+    // Dados de uma tag associada ao processo.
     public string TagName { get; set; } = "";
     public string? PapelDaTag { get; set; }
 }

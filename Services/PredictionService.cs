@@ -1,5 +1,9 @@
 using System.Text.Json;
 
+// Serviço principal de detecção de anomalias.
+// Ele valida configuração e perfil da tag, calcula limites e score,
+// analisa dependências, risco e tendências, monta a mensagem de retorno
+// e persiste o histórico da detecção.
 public class PredictionService
 {
     private readonly AppDbContext _context;

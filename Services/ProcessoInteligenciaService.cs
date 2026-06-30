@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
+// Serviço de inteligência para analisar um processo com base em suas tags.
+// Ele consulta valores atuais, verifica perfis de tag, detecta anomalias,
+// calcula saúde do processo e gera interpretações e resumos.
 public class ProcessoInteligenciaService
 {
     private readonly AppDbContext _context;

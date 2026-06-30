@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
+// Controller para gerenciar dependências entre tags.
+// Ele permite salvar dependências de uma tag e listar dependências já cadastradas.
 [ApiController]
 [Route("api/tags/dependencias")]
 public class TagDependenciaController : ControllerBase
@@ -12,6 +14,8 @@ public class TagDependenciaController : ControllerBase
     }
 
     [HttpPost]
+    // Endpoint: POST /api/tags/dependencias
+    // Recebe uma lista de dependências para uma tag e as salva ou atualiza.
     public IActionResult SalvarDependencias([FromBody] SalvarDependenciasRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.ClienteId))
@@ -60,6 +64,8 @@ public class TagDependenciaController : ControllerBase
     }
 
     [HttpGet("{clienteId}/{tagName}")]
+    // Endpoint: GET /api/tags/dependencias/{clienteId}/{tagName}
+    // Retorna as dependências cadastradas para a tag informada.
     public IActionResult ListarDependencias(string clienteId, string tagName)
     {
         var dependencias = _context.TagDependenciasIa
@@ -74,6 +80,7 @@ public class TagDependenciaController : ControllerBase
 
 public class SalvarDependenciasRequest
 {
+    // Payload usado para salvar dependências de uma tag.
     public string ClienteId { get; set; } = "";
     public string TagName { get; set; } = "";
     public List<DependenciaRequest> Dependencias { get; set; } = new();
@@ -81,6 +88,7 @@ public class SalvarDependenciasRequest
 
 public class DependenciaRequest
 {
+    // Dados de cada dependência, incluindo tag dependente, tipo de relação e impacto.
     public string TagDependente { get; set; } = "";
     public string TipoRelacao { get; set; } = "";
     public string Impacto { get; set; } = "";

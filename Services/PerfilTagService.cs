@@ -1,3 +1,6 @@
+// Serviço responsável por treinar ou atualizar o perfil estatístico de uma tag.
+// Ele busca o histórico de leituras, remove outliers, calcula métricas estatísticas
+// e persiste o perfil resultante no banco de dados.
 public class PerfilTagService
 {
     private readonly IHistoricoService _historicoService;
@@ -14,6 +17,9 @@ public class PerfilTagService
         _limpezaService = limpezaService;
     }
 
+    // Treina o perfil da tag para o cliente informado e retorna o objeto de perfil.
+    // O método valida histórico suficiente, remove outliers e calcula média, desvio,
+    // amplitude, percentual de zeros, variação média e picos.
     public TagPerfilIa TreinarPerfil(string clienteId, string tagName)
     {
         var historico = _historicoService.BuscarHistorico(tagName, "");

@@ -1,5 +1,9 @@
+// Serviço que calcula o score de saúde de um processo com base nas tags analisadas.
+// Ele aplica penalidades para tags sem perfil, não encontradas ou anômalas,
+// e gera uma classificação de saúde e mensagem explicativa.
 public class ProcessoHealthScoreService
 {
+    // Calcula o resultado de saúde do processo a partir das tags analisadas.
     public ResultadoSaudeProcesso Calcular(List<AnaliseTagProcessoResultado> tags)
     {
         if (tags == null || !tags.Any())

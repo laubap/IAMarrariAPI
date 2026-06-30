@@ -1,5 +1,9 @@
+// Serviço que limpa séries históricas de leituras, removendo valores inválidos
+// e outliers usando o método do intervalo interquartil (IQR).
 public class HistoricoLimpezaService
 {
+    // Remove NaN e Infinity e, em seguida, aplica limpeza por IQR para excluir
+    // valores extremos. Retorna o histórico filtrado para uso em análises.
     public List<LeituraBruta> RemoverOutliersPorIqr(List<LeituraBruta> historico)
     {
         if (historico == null || historico.Count == 0)
@@ -57,6 +61,7 @@ public class HistoricoLimpezaService
         return historicoLimpo;
     }
 
+    // Calcula o percentil de uma lista ordenada de valores usando interpolação.
     private double CalcularPercentil(List<double> valoresOrdenados, double percentil)
     {
         if (valoresOrdenados == null || valoresOrdenados.Count == 0)

@@ -1,9 +1,14 @@
+// Modelo de resposta usado quando uma anomalia é detectada.
+// Contém informações de identificação da tag, resultado da detecção,
+// resumo, perfil comportamental, contexto operacional, dependências,
+// risco de processo, tendências e dados do processo associado.
 public class AnomaliaResponse
 {
     public string ClienteId { get; set; } = "";
     public string TagName { get; set; } = "";
     public string TipoTag { get; set; } = "";
 
+    // Indica se o valor recebido foi classificado como anomalia.
     public bool EhAnomalia { get; set; }
     public float Score { get; set; }
 
@@ -18,12 +23,14 @@ public class AnomaliaResponse
     public ProcessoDto? Processo { get; set; }
 }
 
+// Dados resumidos sobre a detecção da anomalia.
 public class ResumoAnomaliaDto
 {
     public string Status { get; set; } = "";
     public string Conclusao { get; set; } = "";
 }
 
+// Dados do perfil comportamental da tag comparando valor recebido com histórico.
 public class PerfilComportamentalDto
 {
     public double ValorRecebido { get; set; }
@@ -33,6 +40,7 @@ public class PerfilComportamentalDto
     public double Score { get; set; }
 }
 
+// Informações operacionais relacionadas à tag, incluindo contexto e ações.
 public class ContextoOperacionalDto
 {
     public string? Descricao { get; set; }
@@ -48,6 +56,7 @@ public class ContextoOperacionalDto
     public string? ObservacaoModoOperacao { get; set; }
 }
 
+// Informações sobre cada dependência de tag avaliada junto com a anomalia.
 public class DependenciaAnalisadaDto
 {
     public string TagName { get; set; } = "";
@@ -70,6 +79,7 @@ public class DependenciaAnalisadaDto
     public string Interpretacao { get; set; } = "";
 }
 
+// Informações de risco de processo associadas à anomalia.
 public class RiscoProcessoDto
 {
     public int Score { get; set; }
@@ -78,6 +88,7 @@ public class RiscoProcessoDto
     public List<string> Fatores { get; set; } = new();
 }
 
+// Tendências de risco e valor para a anomalia.
 public class TendenciasDto
 {
     public string TendenciaRisco { get; set; } = "";
@@ -87,6 +98,7 @@ public class TendenciasDto
     public string MensagemTendenciaValor { get; set; } = "";
 }
 
+// Dados básicos do processo associado à tag e à anomalia.
 public class ProcessoDto
 {
     public string Nome { get; set; } = "";

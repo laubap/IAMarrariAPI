@@ -1,6 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
 
+// Serviço responsável por buscar o histórico de leituras de uma tag no Bridge externo.
+// Ele prepara a URL de consulta, faz a requisição HTTP e converte a resposta JSON
+// em uma lista de objetos LeituraBruta para uso pela IA.
 public class BridgeHistoricoService : IHistoricoService
 {
     private readonly HttpClient _httpClient = new()
@@ -15,6 +18,9 @@ public class BridgeHistoricoService : IHistoricoService
         _configuration = configuration;
     }
 
+    // Busca histórico de valores para a tag informada.
+    // O parâmetro tipoTag não é utilizado internamente aqui, mas a assinatura mantém
+    // compatibilidade com a interface IHistoricoService.
     public List<LeituraBruta> BuscarHistorico(string tagName, string tipoTag)
     {
         var baseUrl =
@@ -128,6 +134,9 @@ public class BridgeHistoricoService : IHistoricoService
     }
 }
 
+// Modelo que representa cada item retornado pelo Bridge para histórico de tag.
+// A propriedade Valor é mantida como JsonElement para permitir conversão
+// segura a partir de números ou strings no JSON.
 public class BridgeHistoricoItem
 {
     public DateTime DataHora { get; set; }

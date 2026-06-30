@@ -1,3 +1,6 @@
+// Serviço que analisa a tendência de risco para uma tag, com base nas últimas
+// detecções de anomalia registradas para ela.
+// Retorna se o risco está melhorando, piorando, estável ou se não há dados suficientes.
 public class TendenciaRiscoService
 {
     private readonly AppDbContext _context;
@@ -7,6 +10,7 @@ public class TendenciaRiscoService
         _context = context;
     }
 
+    // Avalia a tendência do risco usando os últimos registros de anomalia da tag.
     public ResultadoTendenciaRisco Analisar(
         string clienteId,
         string tagName)

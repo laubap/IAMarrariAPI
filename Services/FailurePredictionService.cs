@@ -1,3 +1,6 @@
+// Serviço que calcula a probabilidade de falha com base no resultado da análise de processo.
+// Ele transforma o score de saúde, contagem de tags anômalas e tags sem perfil em uma
+// probabilidade percentual e classificação de risco.
 public class FailurePredictionService
 {
     public ResultadoProbabilidadeFalha Calcular(AnaliseProcessoResultado processo)
@@ -48,6 +51,7 @@ public class FailurePredictionService
     }
 }
 
+// Modelo de retorno para a probabilidade de falha calculada.
 public class ResultadoProbabilidadeFalha
 {
     public int Probabilidade { get; set; }
